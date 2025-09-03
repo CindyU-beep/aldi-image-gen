@@ -1,0 +1,270 @@
+@import "tailwindcss";
+
+@theme {
+    --breakpoint-3xl: 120rem;
+    --breakpoint-4xl: 160rem;
+}
+
+:root {
+    --x-animation-style: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+button:not(:disabled) {
+    --cursor-button: pointer;
+}
+
+/* Nav */
+
+.x-project-nav {
+    animation: fade-in 1s var(--x-animation-style) forwards;
+    animation-delay: .5s;
+    opacity: 0;
+}
+
+/* Timeline */
+
+.x-timeline {
+    width: 100%;
+    --card-border-width: 0;
+    --color-panel: rgba(1, 1, 1, 0.35);
+    --base-card-padding-top: 24px;
+    --base-card-padding-bottom: 24px;
+}
+
+.x-timeline .smooth-scrollbar {
+    --card-border-width: 0;
+    white-space: nowrap;
+    /* scrollbar-width: thin; */
+}
+
+.x-timeline-last {
+    margin-bottom: 52px;
+}
+
+.x-timeline-animate {
+    width: 100%;
+    animation: fade-in-scale 1s var(--x-animation-style) forwards;
+    transform-origin: 'center';
+    transform: scale3d(0.9, 0.9, 0.9);
+    opacity: 0;
+    white-space: nowrap;
+}
+
+.x-timeline ::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+}
+
+.x-timeline ::-webkit-scrollbar-thumb {
+    background: var(--accent-a10);
+    border-radius: 7px;
+}
+
+.x-timeline ::-webkit-scrollbar-track {
+    background: var(--accent-a5) !important;
+    border-radius: 7px;
+}
+
+/* Card */
+
+.x-card {
+    --card-border-width: 0;
+    --color-panel: var(--gray-2);
+}
+
+.x-card-new {
+    height: 744px;
+}
+
+.x-card-input {
+    height: 548px;
+}
+
+.x-embla {
+    overflow: hidden;
+}
+
+.x-embla-slide {
+    flex: 0 0 100%;
+    min-width: 0;
+}
+
+.x-embla-slide-image {
+    position: relative;
+    overflow: hidden;
+    cursor: zoom-in;
+    height: 480px;
+}
+
+.x-embla-slide-image-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: -1;
+    filter: blur(20px);
+    opacity: 0.25;
+    zoom: 1.5;
+}
+
+.x-card-context-image {
+    cursor: zoom-in;
+}
+
+.x-embla-slide-message {
+    display: flex;
+    flex-direction: column;
+    height: 572px;
+}
+
+.x-compare-slider-container div[data-testid="container"] {
+    max-height: calc(85vh - 70px);
+}
+
+.x-compare-slider-container img[data-testid="left-image"][style],
+.x-compare-slider-container img[data-testid="right-image"][style] {
+    object-fit: contain !important;
+}
+
+.x-embla-slide-image-overlay {
+    position: absolute;
+    inset: 0;
+    padding: 8px;
+    transition: opacity 0.3s ease;
+    opacity: 0;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.75) 100%);
+}
+
+.x-embla-slide-image:hover .x-embla-slide-image-overlay {
+    opacity: 1;
+}
+
+.x-generation {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 200px;
+    height: 200px;
+    transform: translate(-50%, -50%);
+}
+
+/* Main */
+
+.x-aside {
+    transition: width .5s var(--x-animation-style);
+    background-color: rgba(0, 0, 0, 0.25);
+    /* box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.1); */
+}
+
+.x-main {
+    animation: fade-in-scale 1s var(--x-animation-style) forwards;
+    transform-origin: 'center';
+    transform: scale3d(0.9, 0.9, 0.9);
+    opacity: 0;
+    background: var(--gray-2);
+}
+
+.x-toolbar::before {
+    background-color: rgba(0, 0, 0, 0.35);
+}
+
+.x-toolbar,
+.x-toolbar::after {
+    --card-border-width: 0;
+    border-radius: 50px;
+}
+
+/* Explore */
+
+.x-explore-grid-container {
+    opacity: 0;
+    animation: fade-in-scale 0.5s ease-in-out forwards;
+    transform: scale3d(0.9, 0.9, 0.9);
+    animation-delay: 500ms;
+}
+
+.x-exploregrid-image {
+    filter: grayscale(100%);
+    transition: all 0.5s ease-in-out;
+    animation-name: to-color;
+    animation-duration: 0.5s;
+    animation-delay: 1500ms;
+    animation-fill-mode: forwards;
+}
+
+.x-exploregrid-image:hover {
+    transform: scale(1.05);
+}
+
+/* Toastify */
+
+.Toastify__toast-theme--dark {
+    border-radius: 50px;
+}
+
+.Toastify__toast-container {
+    display: flex;
+    justify-content: center;
+    width: 100% !important;
+}
+
+.Toastify__toast {
+    width: fit-content !important;
+}
+
+/* Markdown */
+
+.markdown p {
+    margin-top: .5rem;
+    margin-bottom: .5rem;
+}
+
+.markdown h1,
+.markdown h3,
+.markdown h4 {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    font-size: large;
+    color: var(--gray-10);
+}
+
+.markdown ul>li,
+.markdown ol>li {
+    margin: 0 0 .25rem 1rem;
+}
+
+.markdown hr {
+    margin: 2rem 0;
+    opacity: 0.15;
+}
+
+/* Animations */
+
+@keyframes fade-in {
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fade-in-scale {
+    to {
+        opacity: 1;
+        transform: scale3d(1, 1, 1);
+    }
+}
+
+@keyframes to-color {
+    to {
+        filter: grayscale(0%);
+    }
+}
+
+/* Firefox-specific darker background */
+@-moz-document url-prefix() {
+    .x-toolbar::before {
+        background-color: rgba(0, 0, 0, 0.55);
+
+    }
+}
