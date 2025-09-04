@@ -31,8 +31,11 @@ export function useSEO() {
             // Wait for the tokenized URL to be ready
             let finalImageUrl = imageUrl;
 
-            // If it's an Azure Blob Storage URL, get the tokenized version
-            if (imageUrl.includes('.blob.core.windows.net')) {
+            // If it's already a proxy URL, use it directly
+            if (imageUrl.startsWith('/api/image-proxy')) {
+                finalImageUrl = imageUrl;
+            } else if (imageUrl.includes('.blob.core.windows.net')) {
+                // If it's an Azure Blob Storage URL, get the tokenized version
                 const response = await fetch(`/api/blob-url?url=${encodeURIComponent(imageUrl)}`);
                 const data = await response.json();
                 finalImageUrl = data.imageUrl;
@@ -121,7 +124,7 @@ export function useSEO() {
                                     <IconInfoCircle />
                                 </Callout.Icon>
                                 <Callout.Text>
-                                    This feature is intended for products imported from Shopbop or Amazon and designed for eCommerce optimisation.<br />For best results, the first image in your timeline should be a model shot imported via product search, with any modifications made afterward.
+                                    This feature is designed for eCommerce optimisation.<br />For best results, the first image in your timeline should be a model shot imported via product search, with any modifications made afterward.
                                 </Callout.Text>
                             </Callout.Root>
                             <Flex gap="8" mt="4" className="markdown">

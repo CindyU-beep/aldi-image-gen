@@ -16,6 +16,12 @@ export const useImageBlob = (src: string) => {
         setLoading(true);
         setError(null);
 
+        // If it's already a proxy URL (starts with /api/image-proxy), use it directly
+        if (src.startsWith('/api/image-proxy')) {
+            loadImage(src);
+            return;
+        }
+
         // If it's not an Azure Blob Storage URL, load it directly
         if (src.startsWith('http://') || src.startsWith('https://')) {
             if (!src.includes('.blob.core.windows.net')) {
@@ -24,7 +30,7 @@ export const useImageBlob = (src: string) => {
             }
         }
 
-        // Fetch the blob URL from your API first
+        // Fetch the blob URL from your API first (for direct Azure blob URLs)
         fetch(`/api/blob-url?url=${encodeURIComponent(src)}`)
             .then(response => response.json())
             .then(data => {

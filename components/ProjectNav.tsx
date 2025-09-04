@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { Flex, Box, Heading, Separator, Text } from '@radix-ui/themes';
+import Link from 'next/link';
 import { IconCubeUnfolded, IconCirclePlus, IconPhoto, IconHome, IconLayout2, IconEdit, IconDatabaseX } from '@tabler/icons-react';
 import { useProjectCreate } from '@/hooks/useProjectCreate';
 import { useProjectEdit } from '@/hooks/useProjectEdit';
@@ -69,7 +70,7 @@ export default function ProjectNav({ onProjectClicked, onPageChange }: ProjectNa
             <Separator size="4" my="2" />
 
             <Heading size="3" as="h1" my="2" mx="2" color="gray">
-                Projects
+                Campaigns
             </Heading>
 
             {/* List of projects */}
@@ -99,7 +100,7 @@ export default function ProjectNav({ onProjectClicked, onPageChange }: ProjectNa
                     ))
                 ) : (
                     <Box p="2">
-                        <Text color="gray">Create new project below.</Text>
+                        <Text color="gray">Create a new campaign below.</Text>
                     </Box>
                 )}
             </Flex>
@@ -111,7 +112,38 @@ export default function ProjectNav({ onProjectClicked, onPageChange }: ProjectNa
             >
                 <Flex align="center" gap="2">
                     <IconCirclePlus size={20} />
-                    New project
+                    New campaign
+                </Flex>
+            </Box>
+
+            <Box
+                p="2"
+                className={navClasses}
+                onClick={() => useStore.getState().openImageLibraryDialog()}
+            >
+                <Flex align="center" gap="2">
+                    <IconPhoto size={20} />
+                    New product shot
+                </Flex>
+            </Box>
+
+            <Separator size="4" my="2" />
+
+            <Heading size="3" as="h1" my="2" mx="2" color="gray">
+                Branding
+            </Heading>
+            <Box p="2" className={navClasses}>
+                <Flex align="center" gap="2">
+                    <Link href="/brand-kits" className="w-full">
+                        Brand kits
+                    </Link>
+                </Flex>
+            </Box>
+            <Box p="2" className={navClasses}>
+                <Flex align="center" gap="2">
+                    <Link href="/brand-guidelines" className="w-full">
+                        Brand guidelines
+                    </Link>
                 </Flex>
             </Box>
 

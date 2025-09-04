@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { getBlobServiceClient, generateBlobSAS } from '@/lib/azureStorage';
+import { getBlobServiceClient } from '@/lib/azureStorage';
 
 const imagePlaceholder = "https://placehold.co/400x720/111111/7c7c7c?font=lato&text=No+image+available";
 
@@ -72,26 +72,27 @@ export default async function handler(
                 });
             }
 
-            // Generate new SAS token for the blob
-            const sasToken = generateBlobSAS(containerName, blobPath, 4320); // 3 days expiry
-
-            // Construct the correct URL with the proper container
+            // Since key-based authentication is disabled, we cannot generate SAS tokens
+            // Instead, we'll return a proxy URL that our API can serve with Azure AD auth
             const storageAccount = url.hostname.split('.')[0];
             const correctBaseUrl = `https://${storageAccount}.blob.core.windows.net/${containerName}/${blobPath}`;
-            const newImageUrl = sasToken ? `${correctBaseUrl}?${sasToken}` : correctBaseUrl;
+            
+            // Return a proxy URL through our API that can authenticate with Azure AD
+            const proxyUrl = `/api/image-proxy?url=${encodeURIComponent(correctBaseUrl)}`;
 
             return res.status(200).json({
                 exists: true,
-                imageUrl: newImageUrl,
+                imageUrl: proxyUrl,
                 originalUrl: imageUrl,
-                message: "Image found and SAS token refreshed",
+                message: "Image found - using proxy URL for Azure AD authentication",
                 metadata: {
                     containerName,
                     blobName: blobPath,
-                    sasGenerated: !!sasToken,
+                    sasGenerated: false,
                     containerFromUrl: containerFromUrl,
                     containerOverridden: !!containerOverride,
-                    storageAccount
+                    storageAccount,
+                    proxyUrl: proxyUrl
                 }
             });
 

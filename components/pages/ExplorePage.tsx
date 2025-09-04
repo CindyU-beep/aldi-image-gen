@@ -3,10 +3,9 @@ import { useEffect, useState, useRef } from 'react';
 import { useImageLibrary } from '@/hooks/useImageLibrary';
 
 export default function ExplorePage() {
-    const { libraryImages, fetchLibraryImages } = useImageLibrary();
+    const { libraryImages, fetchLibraryImages, isLoading } = useImageLibrary();
     const [hasScrolled, setHasScrolled] = useState(false);
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
-    const [imagesLoaded, setImagesLoaded] = useState(0);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
 
     // Compact scroll detection effect
@@ -26,22 +25,10 @@ export default function ExplorePage() {
         fetchLibraryImages('images', 50);
     }, [fetchLibraryImages]);
 
-    // Reset imagesLoaded when libraryImages changes
-    useEffect(() => {
-        setImagesLoaded(0);
-    }, [libraryImages]);
-
     // Handler for image click toggling selection
     const handleImageClick = (url: string) => {
         setSelectedImage((prev) => (prev === url ? null : url));
     };
-
-    // Handler for image load
-    const handleImageLoad = () => {
-        setImagesLoaded((count) => count + 1);
-    };
-
-    const allImagesLoaded = libraryImages.length > 0 && imagesLoaded >= libraryImages.length;
 
     return (
         <Flex direction="column" className="flex-1 z-1">
@@ -56,18 +43,7 @@ export default function ExplorePage() {
                 </Flex>
             </Box>
             <Box pt="80px" className="overflow-auto p-4 flex-1" ref={scrollContainerRef}>
-                {/* Invisible images for lazy loading */}
-                {libraryImages.map((image) => (
-                    <img
-                        key={image.url + '-preload'}
-                        src={image.url}
-                        alt=""
-                        style={{ display: 'none' }}
-                        onLoad={handleImageLoad}
-                        onError={handleImageLoad}
-                    />
-                ))}
-                {!allImagesLoaded ? (
+                {isLoading ? (
                     <Flex justify="center" align="center" className="flex-1 h-full">
                         <Spinner size="3" mr="2" />
                         <Text color="gray">Loading images...</Text>

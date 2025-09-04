@@ -7,7 +7,7 @@ dotenv.config();
 
 async function testAuth() {
     // Get account name from environment variables if available
-    const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME || 'gbbimagegen';
+    const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME || 'aldidemostorage';
     console.log(`Testing authentication for Azure Storage account: ${accountName}`);
 
     try {

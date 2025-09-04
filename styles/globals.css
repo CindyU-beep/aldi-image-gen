@@ -7,6 +7,19 @@
 
 :root {
     --x-animation-style: cubic-bezier(0.4, 0, 0.2, 1);
+    /* ALDI Nord brand palette */
+    --aldi-blue-700: #003E7E;
+    --aldi-blue-600: #00539F;
+    --aldi-cyan-400: #00A0E2;
+    --aldi-orange-500: #F39200;
+    --aldi-red-500: #E30613;
+
+    /* Light surfaces */
+    --surface-bg: #f7f9fc;
+    --surface-panel: #ffffff;
+    --surface-border: #e6e8eb;
+    --shadow-soft: 0 6px 20px rgba(0,0,0,0.06);
+    --shadow-hover: 0 10px 24px rgba(0,0,0,0.10);
 }
 
 button:not(:disabled) {
@@ -26,7 +39,7 @@ button:not(:disabled) {
 .x-timeline {
     width: 100%;
     --card-border-width: 0;
-    --color-panel: rgba(1, 1, 1, 0.35);
+    --color-panel: rgba(0, 0, 0, 0.05);
     --base-card-padding-top: 24px;
     --base-card-padding-bottom: 24px;
 }
@@ -69,7 +82,7 @@ button:not(:disabled) {
 
 .x-card {
     --card-border-width: 0;
-    --color-panel: var(--gray-2);
+    --color-panel: var(--surface-panel);
 }
 
 .x-card-new {
@@ -153,7 +166,7 @@ button:not(:disabled) {
 
 .x-aside {
     transition: width .5s var(--x-animation-style);
-    background-color: rgba(0, 0, 0, 0.25);
+    background-color: rgba(0, 83, 159, 0.06);
     /* box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.1); */
 }
 
@@ -162,11 +175,11 @@ button:not(:disabled) {
     transform-origin: 'center';
     transform: scale3d(0.9, 0.9, 0.9);
     opacity: 0;
-    background: var(--gray-2);
+    background: var(--surface-bg);
 }
 
 .x-toolbar::before {
-    background-color: rgba(0, 0, 0, 0.35);
+    background-color: rgba(0, 83, 159, 0.08);
 }
 
 .x-toolbar,
@@ -201,6 +214,56 @@ button:not(:disabled) {
 
 .Toastify__toast-theme--dark {
     border-radius: 50px;
+}
+
+/* Light theme toasts */
+.Toastify__toast-theme--light {
+    border-radius: 50px;
+}
+
+/* Modern UI helpers */
+.x-container {
+    width: 100%;
+    max-width: 1280px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.x-modern-card {
+    background: var(--surface-panel);
+    border: 1px solid var(--surface-border);
+    border-radius: 14px;
+    box-shadow: var(--shadow-soft);
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.x-modern-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+}
+
+.x-feature-icon {
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    background: rgba(0, 83, 159, 0.08);
+}
+
+.x-hero-banner {
+    position: relative;
+    overflow: hidden;
+}
+
+.x-hero-banner::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle at 20% 20%, rgba(255,255,255,.12), transparent 40%),
+        radial-gradient(circle at 80% 30%, rgba(255,255,255,.12), transparent 40%);
+    pointer-events: none;
 }
 
 .Toastify__toast-container {

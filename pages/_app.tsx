@@ -16,18 +16,19 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   return (
     auth && (
       <>
-        <Theme accentColor="gray" appearance="dark" panelBackground="solid">
+        <Theme accentColor="blue" appearance="light" panelBackground="soft">
           <Head>
-            <title>GBB ImageDojo</title>
-            <meta name="description" content="By Microsoft Global Black Belt Team" />
+            <title>ALDI Nord Image Studio</title>
+            <meta name="description" content="ALDI Nord marketing image generation and campaign visuals" />
+            <link rel="icon" href="/aldi-nord.png" />
           </Head>
           <Component {...pageProps} />
-          <ToastContainer transition={Zoom} position="top-center" theme="dark" closeButton={false} hideProgressBar />
+          <ToastContainer transition={Zoom} position="top-center" theme="light" closeButton={false} hideProgressBar />
         </Theme>
         <ToastContainer
           transition={Zoom}
           position="top-center"
-          theme="dark"
+          theme="light"
           closeButton={false}
           hideProgressBar
         />

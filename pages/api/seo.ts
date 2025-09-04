@@ -56,7 +56,13 @@ export default async function handler(
         // Fetch the image to include in the API call
         let imageContent;
         try {
-            const imageResponse = await fetch(imageUrl);
+            // Convert relative URLs to absolute URLs for server-side fetch
+            const absoluteUrl = imageUrl.startsWith('/') 
+                ? `${req.headers.host ? `${req.headers['x-forwarded-proto'] || 'http'}://${req.headers.host}` : 'http://localhost:3000'}${imageUrl}`
+                : imageUrl;
+            
+            console.log(`Fetching image from: ${absoluteUrl}`);
+            const imageResponse = await fetch(absoluteUrl);
             if (!imageResponse.ok) {
                 throw new Error(`Failed to fetch image: ${imageResponse.statusText}`);
             }

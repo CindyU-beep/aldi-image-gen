@@ -1,3 +1,4 @@
+
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { GoogleGenAI, Modality, PersonGeneration } from '@google/genai';
 
@@ -45,8 +46,10 @@ export default async function handler(
         if (contextImages && contextImages.length > 0) {
             const imageBlobs = await Promise.all(
                 contextImages.map(async (imageUrl: string) => {
-                    const imageResponse = await fetch(imageUrl);
-                    if (!imageResponse.ok) {
+                const absoluteUrl = imageUrl.startsWith('/')
+                ? `${req.headers['x-forwarded-proto'] || 'http'}://${req.headers.host}${imageUrl}`
+                : imageUrl;
+                const imageResponse = await fetch(absoluteUrl);                    if (!imageResponse.ok) {
                         throw new Error(`Failed to fetch image from URL: ${imageResponse.statusText}`);
                     }
                     return await imageResponse.blob();
@@ -71,7 +74,7 @@ export default async function handler(
             const generationPromises = Array(imageVariations).fill(0).map(async () => {
                 try {
                     const response = await ai.models.generateContent({
-                        model: "gemini-2.0-flash-preview-image-generation",
+                        model: "gemini-2.5-flash-image-preview",
                         contents: contentParts,
                         config: {
                             responseModalities: [Modality.TEXT, Modality.IMAGE],
@@ -103,7 +106,7 @@ export default async function handler(
                 const aspectRatio = imageSize;
 
                 const response = await ai.models.generateImages({
-                    model: 'imagen-3.0-generate-002',
+                    model: 'gemini-2.5-flash-image-preview',
                     prompt: prompt,
                     config: {
                         numberOfImages: imageVariations,

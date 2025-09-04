@@ -68,7 +68,14 @@ export default async function handler(
             try {
                 const imageBlobs = await Promise.all(
                     contextImages.map(async (imageUrl: string | Request | URL, index: number) => {
-                        const imageResponse = await fetch(imageUrl);
+                        // Convert relative URLs to absolute URLs for server-side fetch
+                        const urlString = typeof imageUrl === 'string' ? imageUrl : imageUrl.toString();
+                        const absoluteUrl = urlString.startsWith('/') 
+                            ? `${req.headers.host ? `${req.headers['x-forwarded-proto'] || 'http'}://${req.headers.host}` : 'http://localhost:3000'}${urlString}`
+                            : urlString;
+                        
+                        console.log(`Fetching image from: ${absoluteUrl}`);
+                        const imageResponse = await fetch(absoluteUrl);
                         if (!imageResponse.ok) {
                             throw new Error(`Failed to fetch image #${index + 1} from the provided URL: ${imageResponse.statusText}`);
                         }

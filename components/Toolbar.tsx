@@ -144,11 +144,6 @@ export default function Toolbar() {
                 ...newDefaults,
                 model: value // Ensure the model is set to the selected value
             };
-
-            // Show toast notification when switching to Gemini Image
-            if (value === "Gemini") {
-                toast.info("Gemini Imagen with context images will fall back to Flash Image (Nano Banana) model. Due to API limitations.", { autoClose: 7000 });
-            }
         }
 
         if (key === 'fidelity') {

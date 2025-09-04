@@ -1,5 +1,5 @@
 import { Card, TextArea, Button, IconButton, Flex, Tabs, Heading, Tooltip, Radio, Text, Switch, Badge } from '@radix-ui/themes';
-import { IconTrash, IconArrowsSplit, IconPhotoPlus, IconCircleArrowLeft, IconCircleArrowRight, IconArrowBarBoth, IconSeo } from '@tabler/icons-react';
+import { IconTrash, IconArrowsSplit, IconPhotoPlus, IconCircleArrowLeft, IconCircleArrowRight, IconArrowBarBoth, IconSeo, IconX } from '@tabler/icons-react';
 import useStore, { Settings } from '@/lib/store';
 import { CardData } from '@/components/pages/ProjectPage';
 import { useState, useEffect } from 'react';
@@ -11,7 +11,6 @@ import TimelineCardImage from './TimelineCardImage';
 import { TimelineCardPrompts } from './TimelineCardPrompts';
 import Generation from './Generation';
 import { Shimmer } from './Shimmer';
-import ContextImage from './ContextImage';
 
 interface TimelineCardData extends Omit<CardData, "outputContextImage" | "outputImages"> {
     outputContextImage?: string | null;
@@ -197,13 +196,24 @@ export default function TimelineCard({ projectId, timelineId, card, index, width
                         <Card>
                             <Flex gap="3" align="center" wrap="wrap" className="min-h-[60px]">
                                 {(cardObj.contextImages || []).map((imageUrl, imgIndex) => (
-                                    <ContextImage
-                                        key={imgIndex}
-                                        imageUrl={imageUrl}
-                                        index={imgIndex}
-                                        onPreview={openPreview}
-                                        onRemove={removeContextImage}
-                                    />
+                                    <div key={imgIndex} className="relative">
+                                        <img
+                                            src={imageUrl}
+                                            alt={`Context ${imgIndex}`}
+                                            className="w-16 h-16 object-cover rounded-md cursor-pointer"
+                                            onClick={() => openPreview(imageUrl)}
+                                        />
+                                        <IconButton
+                                            size="1"
+                                            variant="solid"
+                                            radius="full"
+                                            color="gray"
+                                            className="absolute -top-1 -right-1 cursor-pointer"
+                                            onClick={() => removeContextImage(imgIndex)}
+                                        >
+                                            <IconX size={12} />
+                                        </IconButton>
+                                    </div>
                                 ))}
                                 <IconButton variant="ghost" radius="full" onClick={handleImageGallerySelect} highContrast>
                                     <IconPhotoPlus size={20} />

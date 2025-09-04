@@ -8,7 +8,6 @@ An AI-powered image generation and comparison lab that lets you easily create, m
 
 - **Timeline Management**: Create multiple timelines to track your image modifications
 - **AI Image Generation**: Generate product images using OpenAI and Google Gemini models
-- **E-commerce Integration**: Import products from Amazon and Shopbop
 - **SEO Optimization**: Generate SEO metadata for your product images
 - **Side-by-side Comparison**: Compare different image variations easily
 - **Prompt Library**: Use pre-built prompts for fashion, lifestyle, and product photography
@@ -30,7 +29,6 @@ Image Dojo is built as a Next.js application with the following components:
 - npm or yarn
 - Azure OpenAI API key
 - Google Gemini API key
-- Zyte API key (for Amazon/Shopbop integration)
 
 ### Environment Setup
 
@@ -57,8 +55,6 @@ AZURE_OPENAI_4o_API_KEY=your_api_key
 
 # Other APIs
 GOOGLE_GEMINI_API_KEY=your_gemini_api_key
-PEXELS_API_KEY=your_pexels_api_key
-ZYTE_API_KEY=your_zyte_api_key
 ```
 
 ### Installation
@@ -81,9 +77,9 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ### Creating a Project
 
-1. Start by creating a new project from the home page
+1. Start by creating a new campaign from the home page
 2. Add a timeline to your project
-3. Import product images from Amazon, Shopbop, or your local library
+3. Import product images from your local library
 4. Use AI to generate variations or modifications of your product images
 5. Compare different variations side by side
 

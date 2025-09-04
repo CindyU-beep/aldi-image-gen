@@ -1,6 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { listImagesFromContainer, deleteImageFromBlob } from '@/lib/azureStorage';
-import { BlobServiceClient, generateBlobSASQueryParameters, BlobSASPermissions, StorageSharedKeyCredential, SASProtocol } from '@azure/storage-blob';
+import { listImagesFromContainer, deleteImageFromBlob, getBlobServiceClient } from '@/lib/azureStorage';
 import sharp from 'sharp';
 
 // Library container name - using environment variable with fallback
@@ -17,11 +16,7 @@ function sanitizeFileName(fileName: string): string {
 
 async function getLibraryContainerClient() {
     try {
-        const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
-        if (!connectionString) {
-            throw new Error('Azure Storage connection string is not configured');
-        }
-        const blobServiceClient = BlobServiceClient.fromConnectionString(connectionString);
+        const blobServiceClient = getBlobServiceClient();
         const containerClient = blobServiceClient.getContainerClient(AZURE_STORAGE_CONTAINER_LIBRARY);
         await containerClient.createIfNotExists();
         return containerClient;
@@ -48,7 +43,9 @@ export default async function handler(
             const containerName = containerParam || AZURE_STORAGE_CONTAINER_LIBRARY;
             const limitParam = req.query.limit ? parseInt(req.query.limit as string, 10) : undefined;
 
-            let images = await listImagesFromContainer(containerName, true, 60);
+            console.log(`[Image Library API] Fetching images from container: ${containerName}`);
+            
+            let images = await listImagesFromContainer(containerName, false, 60);
 
             // Sort by lastModified descending (if available), then slice
             if (limitParam && Array.isArray(images)) {
@@ -61,12 +58,22 @@ export default async function handler(
                     .slice(0, limitParam);
             }
 
-            console.log(`Retrieved ${images.length} images from container ${containerName}`);
+            console.log(`[Image Library API] Retrieved ${images.length} images from container ${containerName}`);
 
             return res.status(200).json({ images });
         } catch (error) {
-            console.error("Error listing images from container:", error);
+            console.error("[Image Library API] Error listing images from container:", error);
             const message = error instanceof Error ? error.message : String(error);
+            
+            // Provide more specific error messages
+            if (message.includes('Authentication')) {
+                return res.status(500).json({ 
+                    error: "Authentication failed", 
+                    details: "Please check your Azure authentication setup. Make sure you're logged in with 'az login' and have proper permissions.",
+                    troubleshooting: "Run 'az login' and verify access to the storage account"
+                });
+            }
+            
             return res.status(500).json({ error: "Failed to list images", details: message });
         }
     } else if (req.method === 'POST') {
@@ -145,29 +152,8 @@ export default async function handler(
                     }
                 });
 
-                // Generate a SAS token for the uploaded blob
+                // Return the blob URL directly (Azure AD authentication handles access)
                 let imageUrl = blockBlobClient.url;
-                const accountName = process.env.AZURE_STORAGE_ACCOUNT;
-                const accountKey = process.env.AZURE_STORAGE_ACCESS_KEY;
-
-                if (accountName && accountKey) {
-                    try {
-                        const sharedKeyCredential = new StorageSharedKeyCredential(accountName, accountKey);
-                        const startsOn = new Date(Date.now() - 5 * 60 * 1000);
-                        const expiresOn = new Date(Date.now() + 24 * 60 * 60 * 1000);
-                        const sasToken = generateBlobSASQueryParameters({
-                            containerName: AZURE_STORAGE_CONTAINER_LIBRARY,
-                            blobName: safeFileName,
-                            permissions: BlobSASPermissions.parse('r'),
-                            startsOn,
-                            expiresOn,
-                            protocol: SASProtocol.Https,
-                        }, sharedKeyCredential).toString();
-                        imageUrl = `${blockBlobClient.url}?${sasToken}`;
-                    } catch (error) {
-                        console.warn('Failed to generate SAS token:', error);
-                    }
-                }
 
                 console.log(`Successfully uploaded ${safeFileName} to ${AZURE_STORAGE_CONTAINER_LIBRARY}`);
 

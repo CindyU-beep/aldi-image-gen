@@ -5,7 +5,7 @@ import { v4 as uuid } from 'uuid';
 const defaultSettings = {
     model: 'GPT Image 1',
     format: 'png',
-    size: '1024x1536',
+    size: '1024x1024',
     quality: 'High',
     fidelity: 'Low',
     background: 'Auto',

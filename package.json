@@ -1,5 +1,5 @@
 {
-  "name": "gbb-image-dojo",
+  "name": "aldi-image-gen",
   "version": "0.1.0",
   "type": "module",
   "private": true,
@@ -10,7 +10,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@azure/identity": "^4.10.0",
+    "@azure/identity": "^4.11.1",
     "@azure/storage-blob": "^12.27.0",
     "@google/genai": "^0.14.1",
     "@radix-ui/themes": "^3.2.1",

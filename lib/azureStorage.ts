@@ -1,70 +1,65 @@
 import {
     BlobServiceClient,
-    StorageSharedKeyCredential,
-    generateBlobSASQueryParameters,
-    BlobSASPermissions,
-    SASProtocol,
     ContainerClient
 } from '@azure/storage-blob';
+import { DefaultAzureCredential, ClientSecretCredential } from '@azure/identity';
 
 // Configuration
-const AZURE_STORAGE_CONNECTION_STRING = process.env.AZURE_STORAGE_CONNECTION_STRING || '';
 const AZURE_STORAGE_CONTAINER = process.env.AZURE_STORAGE_CONTAINER_IMAGES || 'images';
-const AZURE_STORAGE_ACCOUNT = process.env.AZURE_STORAGE_ACCOUNT || '';
-const AZURE_STORAGE_ACCESS_KEY = process.env.AZURE_STORAGE_ACCESS_KEY || '';
+const AZURE_STORAGE_ACCOUNT = process.env.AZURE_STORAGE_ACCOUNT || 'aldidemostorage';
+
+// Helper function to generate SAS token for blob access
+const generateBlobSAS = (containerName: string, blobName: string, expiryMinutes: number = 60): string | null => {
+    // This storage account has key-based authentication disabled
+    // SAS tokens cannot be generated without storage account keys
+    // Return null to use direct blob URLs with Azure AD authentication
+    console.log('Storage account has key-based authentication disabled - using Azure AD authentication');
+    return null;
+};
 
 // Get a reference to the blob service client
 export const getBlobServiceClient = (): BlobServiceClient => {
-    if (!AZURE_STORAGE_CONNECTION_STRING) {
-        throw new Error('Azure Storage connection string not configured');
-    }
-    return BlobServiceClient.fromConnectionString(AZURE_STORAGE_CONNECTION_STRING);
-};
+    const accountName = AZURE_STORAGE_ACCOUNT;
 
-// Create a shared key credential for SAS generation
-const getSharedKeyCredential = (): StorageSharedKeyCredential | null => {
-    if (!AZURE_STORAGE_ACCOUNT || !AZURE_STORAGE_ACCESS_KEY) {
-        console.warn('Azure Storage account name or access key not configured. SAS tokens will not be available.');
-        return null;
-    }
-    return new StorageSharedKeyCredential(AZURE_STORAGE_ACCOUNT, AZURE_STORAGE_ACCESS_KEY);
-};
-
-// Generate a SAS token for a blob with improved settings
-export const generateBlobSAS = (
-    containerName: string,
-    blobName: string,
-    expiryMinutes: number = 5
-): string => {
-    const sharedKeyCredential = getSharedKeyCredential();
-
-    if (!sharedKeyCredential) {
-        console.warn('Cannot generate SAS token: credentials not available');
-        return '';
+    if (!accountName) {
+        throw new Error('Azure Storage account name not configured. Please set AZURE_STORAGE_ACCOUNT environment variable.');
     }
 
-    // Add 5 min buffer before current time to handle clock skew
-    const startsOn = new Date(Date.now() - 5 * 60 * 1000);
-    const expiresOn = new Date(Date.now() + expiryMinutes * 60 * 1000);
+    // Skip connection string if key-based auth is disabled (which is common for secure storage accounts)
+    if (process.env.AZURE_STORAGE_CONNECTION_STRING) {
+        console.log('Connection string available, but skipping due to key-based authentication restrictions...');
+        console.log('Using Service Principal authentication instead for better security.');
+    }
 
-    const sasOptions = {
-        containerName,
-        blobName,
-        permissions: BlobSASPermissions.parse('racwd'), // Read, Add, Create, Write, Delete
-        startsOn,
-        expiresOn,
-        protocol: SASProtocol.Https,
-    };
+    // Use Service Principal (Client Secret) authentication
+    if (process.env.AZURE_CLIENT_ID && process.env.AZURE_TENANT_ID && process.env.AZURE_CLIENT_SECRET) {
+        try {
+            console.log('Using Azure Service Principal (Client Secret) authentication...');
+            const credential = new ClientSecretCredential(
+                process.env.AZURE_TENANT_ID,
+                process.env.AZURE_CLIENT_ID,
+                process.env.AZURE_CLIENT_SECRET
+            );
+            return new BlobServiceClient(
+                `https://${accountName}.blob.core.windows.net`,
+                credential
+            );
+        } catch (error) {
+            console.error('Failed to create BlobServiceClient with Service Principal:', error);
+        }
+    }
 
+    // Fallback to DefaultAzureCredential (includes managed identity, CLI, etc.)
     try {
-        const sasToken = generateBlobSASQueryParameters(
-            sasOptions,
-            sharedKeyCredential
-        ).toString();
-        return sasToken;
-    } catch (error) {
-        console.error('Error generating SAS token:', error);
-        return '';
+        console.log('Falling back to DefaultAzureCredential...');
+        const credential = new DefaultAzureCredential();
+        return new BlobServiceClient(
+            `https://${accountName}.blob.core.windows.net`,
+            credential
+        );
+    } catch (fallbackError) {
+        console.error('Failed to create BlobServiceClient with DefaultAzureCredential:', fallbackError);
+        throw new Error(`Failed to authenticate with Azure Storage. Please check your Azure authentication configuration. Error: ${fallbackError}`);
     }
 };
 
@@ -181,7 +176,7 @@ export async function deleteImageFromBlob(
 
 export async function listImagesFromContainer(
     containerName: string = AZURE_STORAGE_CONTAINER,
-    generateSAS: boolean = true,
+    generateSAS: boolean = false, // Default to false since SAS generation doesn't work with Azure AD
     expiryMinutes: number = 5
 ): Promise<{ name: string, url: string, lastModified?: Date, size?: number }[]> {
     try {
@@ -198,16 +193,13 @@ export async function listImagesFromContainer(
             const blobClient = containerClient.getBlobClient(blob.name);
             let blobUrl = blobClient.url;
 
-            if (generateSAS) {
-                const sasToken = generateBlobSAS(containerName, blob.name, expiryMinutes);
-                if (sasToken) {
-                    blobUrl = `${blobUrl}?${sasToken}`;
-                }
-            }
+            // Skip SAS generation since it's not supported with Azure AD auth
+            // The images will be served through the image proxy API instead
+            console.log(`Found blob: ${blob.name}, URL: ${blobUrl}`);
 
             blobs.push({
                 name: blob.name,
-                url: blobUrl,
+                url: `/api/image-proxy?container=${containerName}&blob=${encodeURIComponent(blob.name)}`,
                 lastModified: blob.properties.lastModified,
                 size: blob.properties.contentLength
             });

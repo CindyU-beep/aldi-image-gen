@@ -58,6 +58,11 @@ export const useImageGeneration = () => {
 
         const refreshPromises = urls.map(async (src) => {
             try {
+                // If it's already a proxy URL, return it directly
+                if (src.startsWith('/api/image-proxy')) {
+                    return src;
+                }
+
                 // If it's not an Azure Blob Storage URL, return it directly
                 if (src.startsWith('http://') || src.startsWith('https://')) {
                     if (!src.includes('.blob.core.windows.net')) {
@@ -102,13 +107,19 @@ export const useImageGeneration = () => {
             const refreshedContextImages = await refreshBlobUrls(contextImages || []);
 
             let response: Response;
-            let data: { data: string | any[]; };
+            let data: { data: any[] };
 
-            const api = storeSettings.model === "GPT Image 1" ? "openai-image" :
-                storeSettings.model === "FLUX.1 Kontext Pro" ? "flux-image" :
-                    "google-image";
+            // Choose API based on selected model
+            const api = storeSettings.model === "Gemini"
+                ? "gemini-image"
+                : storeSettings.model === "FLUX.1 Kontext Pro"
+                    ? "flux-image"
+                    : "gpt-image";
 
-            response = await fetch(`${process.env.BACKEND_URL}/${api}`, {
+            console.log(`[Image Generation] Using API: ${api} for model: ${storeSettings.model}`);
+            console.log(`[Image Generation] Calling: /api/${api}`);
+
+            response = await fetch(`/api/${api}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -116,7 +127,7 @@ export const useImageGeneration = () => {
                 body: JSON.stringify({
                     contextPrompt: contextPrompt,
                     contextImages: refreshedContextImages, // Use refreshed URLs
-                    contextSettings: storeSettings,
+                    contextSettings: { ...storeSettings },
                 })
             });
 
@@ -129,7 +140,16 @@ export const useImageGeneration = () => {
                     contextSettings: storeSettings,
                 });
 
-                toast.error(`${errorData.details?.error?.message || "Failed to generate image"}`);
+                // Better error message handling
+                let errorMessage = "Failed to generate image";
+                if (errorData.error) {
+                    errorMessage = errorData.error;
+                }
+                if (errorData.details) {
+                    errorMessage += `: ${errorData.details}`;
+                }
+
+                toast.error(errorMessage);
 
                 // Show more details if available
                 throw new Error(
@@ -150,111 +170,40 @@ export const useImageGeneration = () => {
             const allImageUrls: string[] = [];
             let firstImageUrl: string | undefined = undefined;
 
-            // Process each variation returned from the API
-            if (storeSettings.model === "GPT Image 1") {
-                // Handle GPT Image API response format
-                if (data.data && Array.isArray(data.data) && data.data.length > 0) {
-                    for (let i = 0; i < data.data.length; i++) {
-                        const base64Image = data.data[i]?.b64_json;
+            // Handle common image response formats across providers
+            if (data.data && Array.isArray(data.data) && data.data.length > 0) {
+                for (let i = 0; i < data.data.length; i++) {
+                    const item = data.data[i];
+                    // Prefer url if provided, else construct from b64_json
+                    let dataUrl: string | undefined = item?.url;
+                    const b64 = item?.b64_json;
 
-                        if (base64Image) {
-                            try {
-                                // Format for the image file
-                                const imageFormat = storeSettings.format || "png";
-
-                                // Upload the base64 image to Azure Blob Storage
-                                const imageUrl = await uploadToAzureBlob(base64Image, imageFormat);
-
-                                // Save the first image URL to use as the main output image
-                                if (i === 0) {
-                                    firstImageUrl = imageUrl;
-                                }
-
-                                allImageUrls.push(imageUrl);
-                            } catch (uploadError) {
-                                console.error(`Failed to upload image ${i + 1}:`, uploadError);
-                                // Continue with other images instead of failing completely
-                            }
-                        }
+                    if (!dataUrl && b64) {
+                        const imageFormat = (storeSettings.format || "png").toLowerCase();
+                        dataUrl = `data:image/${imageFormat};base64,${b64}`;
                     }
-                }
-            } else if (storeSettings.model === "FLUX.1 Kontext Pro") {
-                // Handle Flux API response format
-                console.log('Processing Flux response:', data);
 
-                if (data.data && Array.isArray(data.data) && data.data.length > 0) {
-                    for (let i = 0; i < data.data.length; i++) {
-                        const imageData = data.data[i];
-                        console.log(`Processing Flux image ${i + 1}:`, imageData);
-                        let base64Image: string | undefined;
-
-                        // Handle different possible response formats from Flux API
-                        if (imageData?.b64_json) {
-                            base64Image = imageData.b64_json;
-                        } else if (imageData?.url && imageData.url.startsWith('data:image/')) {
-                            // Extract base64 from data URL if that's the format
-                            const base64Match = imageData.url.match(/^data:image\/[^;]+;base64,(.+)$/);
-                            if (base64Match && base64Match[1]) {
-                                base64Image = base64Match[1];
-                            }
-                        }
-
-                        if (base64Image) {
-                            try {
-                                // Format for the image file
-                                const imageFormat = storeSettings.format || "png";
-
-                                // Upload the base64 image to Azure Blob Storage
-                                const imageUrl = await uploadToAzureBlob(base64Image, imageFormat);
-
-                                // Save the first image URL to use as the main output image
-                                if (i === 0) {
-                                    firstImageUrl = imageUrl;
-                                }
-
-                                allImageUrls.push(imageUrl);
-                            } catch (uploadError) {
-                                console.error(`Failed to upload image ${i + 1}:`, uploadError);
-                                // Continue with other images instead of failing completely
-                            }
-                        } else {
-                            console.log(`No valid base64 image found for image ${i + 1}`);
-                        }
-                    }
-                } else {
-                    console.log('No valid data array found in Flux response');
-                }
-            } else {
-                // Handle Gemini API response format
-                if (data.data && Array.isArray(data.data) && data.data.length > 0) {
-                    for (let i = 0; i < data.data.length; i++) {
-                        const dataUrl = data.data[i]?.url;
-
-                        if (dataUrl) {
-                            try {
-                                // Extract the base64 data from the data URL
+                    if (dataUrl) {
+                        try {
+                            // If it's a data URL, upload to blob; otherwise, use the direct URL
+                            if (dataUrl.startsWith('data:image/')) {
                                 const base64Match = dataUrl.match(/^data:image\/[^;]+;base64,(.+)$/);
-
                                 if (base64Match && base64Match[1]) {
-                                    // Format for the image file
                                     const imageFormat = storeSettings.format || "png";
-
-                                    // Upload the base64 image to Azure Blob Storage
                                     const imageUrl = await uploadToAzureBlob(base64Match[1], imageFormat);
-
-                                    // Save the first image URL to use as the main output image
-                                    if (i === 0) {
-                                        firstImageUrl = imageUrl;
-                                    }
-
+                                    if (i === 0) firstImageUrl = imageUrl;
                                     allImageUrls.push(imageUrl);
                                 } else {
                                     console.error(`Invalid data URL format for image ${i + 1}:`, dataUrl);
                                 }
-                            } catch (uploadError) {
-                                console.error(`Failed to process image ${i + 1}:`, uploadError);
-                                // Continue with other images instead of failing completely
+                            } else {
+                                // Assume it's a stable URL returned by the provider
+                                if (i === 0) firstImageUrl = dataUrl;
+                                allImageUrls.push(dataUrl);
                             }
+                        } catch (uploadError) {
+                            console.error(`Failed to process image ${i + 1}:`, uploadError);
+                            // Continue with other images instead of failing completely
                         }
                     }
                 }

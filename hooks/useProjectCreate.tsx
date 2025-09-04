@@ -23,7 +23,7 @@ export function useProjectCreate() {
 
         const [localName, setLocalName] = useState(() => {
             const projectCount = projects.length;
-            return projectCount > 0 ? `New project ${projectCount + 1}` : 'New project';
+            return projectCount > 0 ? `New campaign ${projectCount + 1}` : 'New campaign';
         });
 
         const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -36,11 +36,11 @@ export function useProjectCreate() {
         return (
             <Dialog.Root open={isCreateDialogOpen}>
                 <Dialog.Content maxWidth="500px">
-                    <Dialog.Title>New project</Dialog.Title>
+                    <Dialog.Title>New campaign</Dialog.Title>
                     <Box mb="4">
                         <TextField.Root
                             size="3"
-                            placeholder="Enter a name for your new project"
+                            placeholder="Enter a name for your new campaign"
                             defaultValue={localName}
                             onChange={(e) => setLocalName(e.target.value)}
                             onKeyDown={handleKeyDown}

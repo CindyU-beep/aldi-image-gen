@@ -15,15 +15,15 @@ const Header = ({ hideHeading }: HeaderProps) => {
         >
             <Flex align="center">
                 <Image
-                    src="./assets/gbb-logo.svg"
-                    alt="GBB Logo"
-                    width="20"
-                    height="20"
+                    src="/aldi-nord.png"
+                    alt="ALDI Nord"
+                    width="36"
+                    height="36"
                     className="cursor-pointer"
                 />
                 {!hideHeading && (
-                    <Heading size="3" as="h1" className="!ml-2">
-                        ImageDojo
+                    <Heading size="4" as="h1" className="!ml-3">
+                        Marketing Studio
                     </Heading>
                 )}
             </Flex>
