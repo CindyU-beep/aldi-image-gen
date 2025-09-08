@@ -11,14 +11,17 @@ interface ActionCardProps {
     content: React.ReactNode;
     index: number;
     variant: number;
+    timelineName?: string;
 }
 
-const ActionCard = ({ title, content, index, variant }: ActionCardProps) => {
+const ActionCard = ({ title, content, index, variant, timelineName }: ActionCardProps) => {
     return (
         <Card size="2" className="embla-slide min-w-[300px] max-w-[400px]" style={{ margin: '0 8px', flex: '0 0 auto' }}>
             <Flex direction="column" gap="2">
                 <Flex justify="between" align="center">
-                    <Badge color={variant % 2 === 0 ? 'blue' : 'purple'} size="2">V{variant}</Badge>
+                    <Badge color={variant % 2 === 0 ? 'blue' : 'purple'} size="2">
+                        {timelineName || `V${variant}`}
+                    </Badge>
                     <Text size="1" color="gray">{index}</Text>
                 </Flex>
                 <Heading size="2" as="h3">{title}</Heading>
@@ -77,6 +80,7 @@ export function useActionsView() {
                         title="Context Images"
                         index={card.index + 1}
                         variant={timelineIndex + 1}
+                        timelineName={timeline.name}
                         content={
                             <Flex gap="2" wrap="wrap">
                                 {card.contextImages.map((img, i) => (
@@ -101,6 +105,7 @@ export function useActionsView() {
                         title="Prompt"
                         index={card.index + 1}
                         variant={timelineIndex + 1}
+                        timelineName={timeline.name}
                         content={
                             <Text size="2">{card.contextPrompt}</Text>
                         }
@@ -116,6 +121,7 @@ export function useActionsView() {
                         title="Settings"
                         index={card.index + 1}
                         variant={timelineIndex + 1}
+                        timelineName={timeline.name}
                         content={
                             <Flex direction="column" gap="1">
                                 <Text size="1">Model: {card.contextSettings.model}</Text>
@@ -138,6 +144,7 @@ export function useActionsView() {
                             title={`Output Image ${imgIndex + 1}`}
                             index={card.index + 1}
                             variant={timelineIndex + 1}
+                            timelineName={timeline.name}
                             content={
                                 <img
                                     src={checkImageUrl(img)}

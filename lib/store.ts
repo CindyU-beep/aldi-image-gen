@@ -38,6 +38,7 @@ export interface Card {
 
 export interface Timeline {
     id: string
+    name: string
     fromTimelineId: string | null
     cards: Card[]
 }
@@ -73,6 +74,7 @@ export type Store = {
     removeProject: (projectId: string) => void
     addTimeline: (projectId: string, fromTimelineId: string | null) => void
     removeTimeline: (projectId: string, timelineId: string) => void
+    updateTimelineName: (projectId: string, timelineId: string, name: string) => void
     addCard: (
         projectId: string,
         timelineId: string,
@@ -136,6 +138,7 @@ const useStore = create<Store>()(
                         name,
                         timelines: [{
                             id: timelineId,
+                            name: "Variant 1",
                             fromTimelineId: null,
                             cards: [{
                                 id: uuid(),
@@ -161,10 +164,12 @@ const useStore = create<Store>()(
                     projects: state.projects.map(project => {
                         if (project.id !== projectId) return project
                         const newTimelineId = uuid();
+                        const timelineCount = project.timelines.length + 1;
                         return {
                             ...project,
                             timelines: [...project.timelines, {
                                 id: newTimelineId,
+                                name: `Variant ${timelineCount}`,
                                 fromTimelineId,
                                 cards: [{
                                     id: uuid(),
@@ -188,6 +193,21 @@ const useStore = create<Store>()(
                         return {
                             ...project,
                             timelines: project.timelines.filter(t => t.id !== timelineId),
+                        }
+                    }),
+                })),
+
+            updateTimelineName: (projectId, timelineId, name) =>
+                set((state) => ({
+                    projects: state.projects.map(project => {
+                        if (project.id !== projectId) return project
+                        return {
+                            ...project,
+                            timelines: project.timelines.map(timeline => 
+                                timeline.id === timelineId 
+                                    ? { ...timeline, name } 
+                                    : timeline
+                            ),
                         }
                     }),
                 })),
@@ -243,6 +263,7 @@ const useStore = create<Store>()(
                         if (project.id !== projectId) return project
                         const newTimeline = {
                             id: uuid(),
+                            name: `Variant ${project.timelines.length + 1}`,
                             fromTimelineId,
                             cards: [{
                                 id: uuid(),
@@ -379,6 +400,19 @@ const useStore = create<Store>()(
                 isActionsViewOpen: false,
                 activeActionsTimeline: null
             }),
+            onRehydrateStorage: () => (state) => {
+                // Migrate existing timelines to have names
+                if (state?.projects) {
+                    state.projects = state.projects.map(project => ({
+                        ...project,
+                        timelines: project.timelines.map((timeline, index) => ({
+                            ...timeline,
+                            // Add name if it doesn't exist
+                            name: timeline.name || `Variant ${index + 1}`
+                        }))
+                    }));
+                }
+            }
         },
     ),
 )

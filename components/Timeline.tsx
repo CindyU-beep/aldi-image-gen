@@ -5,6 +5,7 @@ import { IconTrash, IconSquareRoundedPlus } from '@tabler/icons-react'; // Remov
 import TimelineCard from '@/components/TimelineCard';
 import TimelineCardNew from '@/components/TimelineCardNew';
 import TimelineSyncContainer from '@/components/TimelineSyncContainer';
+import EditableTimelineName from '@/components/EditableTimelineName';
 import useStore from '@/lib/store';
 
 // Define card interface for better reusability and type safety
@@ -30,6 +31,7 @@ export interface TimelineCard {
 
 export type Timeline = {
     id: string;
+    name: string;
     cards: TimelineCard[];
 };
 
@@ -52,6 +54,7 @@ interface TimelineCardResult {
 
 export default function Timeline({ projectId, timelines, addTimeline, removeTimeline }: TimelineProps) {
     const asside = useStore(state => state.asside);
+    const updateTimelineName = useStore(state => state.updateTimelineName);
     const [timelineWidth, setTimelineWidth] = useState<number>(0);
     // Use openActionsView directly from store
     // const openActionsView = useStore(state => state.openActionsView);
@@ -148,7 +151,19 @@ export default function Timeline({ projectId, timelines, addTimeline, removeTime
         const maxIndex = Math.max(...timeline.cards.map(c => c.index));
         const lastCard = timeline.cards.find(c => c.index === maxIndex);
 
-        return lastCard ? (lastCard.outputContextImage as string | null) : null;
+        if (!lastCard) return null;
+
+        // First try to use the selected context image
+        if (lastCard.outputContextImage) {
+            return lastCard.outputContextImage;
+        }
+
+        // If no context image is selected, use the first output image as fallback
+        if (lastCard.outputImages && lastCard.outputImages.length > 0) {
+            return lastCard.outputImages[0];
+        }
+
+        return null;
     };
 
     return (
@@ -170,9 +185,11 @@ export default function Timeline({ projectId, timelines, addTimeline, removeTime
                     <Flex key={timeline.id} className={timelineClasses} style={{ width: `${timelineWidth}px` }}>
                         <Card size="5" className="x-timeline" mb="4">
                             <Flex justify="between" align="center" mb="2">
-                                <Heading size="4" as="h2" my="1">
-                                    Variant {timelineIndex + 1}
-                                </Heading>
+                                <EditableTimelineName
+                                    name={timeline.name || `Variant ${timelineIndex + 1}`}
+                                    onNameChange={(newName) => updateTimelineName(projectId, timeline.id, newName)}
+                                    size="4"
+                                />
                                 {/* <Tooltip content="Actions view">
                                     <IconButton
                                         variant="ghost"

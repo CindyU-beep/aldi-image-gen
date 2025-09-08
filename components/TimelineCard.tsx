@@ -7,6 +7,7 @@ import useEmblaCarousel from 'embla-carousel-react';
 import { useImageGeneration } from '@/hooks/useImageGeneration';
 import { useImagePreview } from '@/hooks/useImagePreview';
 import { useSEO } from '@/hooks/useSEO';
+import useImageBlob from '@/hooks/useImageBlob';
 import TimelineCardImage from './TimelineCardImage';
 import { TimelineCardPrompts } from './TimelineCardPrompts';
 import Generation from './Generation';
@@ -20,12 +21,61 @@ interface TimelineCardData extends Omit<CardData, "outputContextImage" | "output
 }
 
 interface TimelineCardProps {
-    projectId: string
-    timelineId: string
-    card: CardData
-    index: number
-    width: number
-    isLast: boolean
+    projectId: string;
+    timelineId: string;
+    card: CardData;
+    index: number;
+    width: number;
+    isLast: boolean;
+}
+
+function ContextImage({ imageUrl, imgIndex, openPreview, removeContextImage }: {
+    imageUrl: string;
+    imgIndex: number;
+    openPreview: (url: string) => void;
+    removeContextImage: (index: number) => void;
+}) {
+    const { imageUrl: processedImageUrl, loading, error } = useImageBlob(imageUrl);
+
+    if (error) {
+        return (
+            <div className="relative w-16 h-16 bg-gray-100 rounded-md flex items-center justify-center">
+                <Text size="1" className="text-gray-500 text-center">Failed to load</Text>
+                <IconButton
+                    size="1"
+                    variant="solid"
+                    radius="full"
+                    color="gray"
+                    className="absolute -top-1 -right-1 cursor-pointer"
+                    onClick={() => removeContextImage(imgIndex)}
+                >
+                    <IconX size={12} />
+                </IconButton>
+            </div>
+        );
+    }
+
+    return (
+        <div className="relative">
+            <img
+                src={processedImageUrl}
+                alt={`Context ${imgIndex}`}
+                className="w-16 h-16 object-cover rounded-md cursor-pointer"
+                style={{ opacity: loading ? 0.5 : 1 }}
+                onClick={() => openPreview(processedImageUrl)}
+            />
+            <IconButton
+                size="1"
+                variant="solid"
+                radius="full"
+                color="gray"
+                className="absolute -top-1 -right-1 cursor-pointer"
+                onClick={() => removeContextImage(imgIndex)}
+            >
+                <IconX size={12} />
+            </IconButton>
+        </div>
+    );
 }
 
 export default function TimelineCard({ projectId, timelineId, card, index, width, isLast }: TimelineCardProps) {
@@ -196,24 +246,13 @@ export default function TimelineCard({ projectId, timelineId, card, index, width
                         <Card>
                             <Flex gap="3" align="center" wrap="wrap" className="min-h-[60px]">
                                 {(cardObj.contextImages || []).map((imageUrl, imgIndex) => (
-                                    <div key={imgIndex} className="relative">
-                                        <img
-                                            src={imageUrl}
-                                            alt={`Context ${imgIndex}`}
-                                            className="w-16 h-16 object-cover rounded-md cursor-pointer"
-                                            onClick={() => openPreview(imageUrl)}
-                                        />
-                                        <IconButton
-                                            size="1"
-                                            variant="solid"
-                                            radius="full"
-                                            color="gray"
-                                            className="absolute -top-1 -right-1 cursor-pointer"
-                                            onClick={() => removeContextImage(imgIndex)}
-                                        >
-                                            <IconX size={12} />
-                                        </IconButton>
-                                    </div>
+                                    <ContextImage
+                                        key={imgIndex}
+                                        imageUrl={imageUrl}
+                                        imgIndex={imgIndex}
+                                        openPreview={openPreview}
+                                        removeContextImage={removeContextImage}
+                                    />
                                 ))}
                                 <IconButton variant="ghost" radius="full" onClick={handleImageGallerySelect} highContrast>
                                     <IconPhotoPlus size={20} />
