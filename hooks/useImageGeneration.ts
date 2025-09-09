@@ -119,14 +119,15 @@ export const useImageGeneration = () => {
             console.log(`[Image Generation] Using API: ${api} for model: ${storeSettings.model}`);
             console.log(`[Image Generation] Calling: /api/${api}`);
 
+            // Send the original prompt to backend - backend handles all ALDI logo integration
             response = await fetch(`/api/${api}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    contextPrompt: contextPrompt,
-                    contextImages: refreshedContextImages, // Use refreshed URLs
+                    contextPrompt: contextPrompt, // Send original prompt - backend handles ALDI enhancement
+                    contextImages: refreshedContextImages,
                     contextSettings: { ...storeSettings },
                 })
             });
@@ -135,7 +136,7 @@ export const useImageGeneration = () => {
                 const errorData = await response.json();
                 console.error("API error response:", errorData);
                 console.error("Request payload:", {
-                    contextPrompt,
+                    contextPrompt: contextPrompt, // Backend automatically handles ALDI logo integration
                     contextImages: refreshedContextImages,
                     contextSettings: storeSettings,
                 });
@@ -222,14 +223,21 @@ export const useImageGeneration = () => {
             });
 
             // Show success message
-            // Replace the manual model name determination with our helper
             const modelName = getModelDisplayName(
                 storeSettings.model,
                 storeSettings.engine,
                 Boolean(refreshedContextImages?.length)
             );
+            
+            console.log('[Debug] Model display name:', {
+                model: storeSettings.model,
+                engine: storeSettings.engine,
+                hasContextImages: Boolean(refreshedContextImages?.length),
+                modelName
+            });
 
-            toast.success(`${allImageUrls.length} image(s) generated with ${modelName} model.`);
+            const actionType = refreshedContextImages && refreshedContextImages.length > 0 ? "edited" : "generated";
+            toast.success(`${allImageUrls.length} image(s) ${actionType} with ${modelName} model.`);
             return allImageUrls;
         } catch (error) {
             console.error("Error generating or storing image:", error);

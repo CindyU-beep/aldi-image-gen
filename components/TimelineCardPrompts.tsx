@@ -17,7 +17,7 @@ export const productPrompts = [
     },
     {
         "label": "Family meal scene",
-        "prompt": "Family gathered around a dinner table enjoying a meal made with ALDI products, warm atmosphere, natural lighting, authentic family moments."
+        "prompt": "Family gathered around a dinner table enjoying a meal made with ALDI Nord products, warm atmosphere, natural lighting, authentic family moments."
     },
     {
         "label": "Kitchen prep scene",
@@ -25,7 +25,7 @@ export const productPrompts = [
     },
     {
         "label": "Grocery basket composition",
-        "prompt": "Shopping basket or reusable bag filled with ALDI products, emphasizing variety and value, clean background, perfect for promotional materials."
+        "prompt": "Shopping basket or reusable bag filled with ALDI Nord products, emphasizing variety and value, clean background, perfect for promotional materials."
     },
     {
         "label": "Product in pantry/fridge",
@@ -49,11 +49,11 @@ export const productPrompts = [
 export const lifestylePrompts = [
     {
         "label": "Weekly shopping trip",
-        "prompt": "Happy customer with shopping cart full of ALDI products in a modern, clean grocery store setting, natural lighting, authentic shopping experience."
+        "prompt": "Happy customer with shopping cart full of ALDI Nord products in a modern, clean grocery store setting, natural lighting, authentic shopping experience."
     },
     {
         "label": "Meal planning session",
-        "prompt": "Person planning weekly meals with ALDI products spread on kitchen counter, notebook and pen visible, organized and efficient lifestyle."
+        "prompt": "Person planning weekly meals with ALDI Nord Nord products spread on kitchen counter, notebook and pen visible, organized and efficient lifestyle."
     },
     {
         "label": "Quick weeknight dinner",
@@ -61,7 +61,7 @@ export const lifestylePrompts = [
     },
     {
         "label": "Special occasion cooking",
-        "prompt": "Elegant dinner party or holiday meal preparation using premium ALDI products, sophisticated kitchen setting, warm ambient lighting."
+        "prompt": "Elegant dinner party or holiday meal preparation using premium ALDI Nord products, sophisticated kitchen setting, warm ambient lighting."
     },
     {
         "label": "Student budget meal",
@@ -69,11 +69,11 @@ export const lifestylePrompts = [
     },
     {
         "label": "Outdoor picnic/BBQ",
-        "prompt": "Family or friends enjoying outdoor dining with ALDI products, picnic table or BBQ setting, summer atmosphere, social gathering."
+        "prompt": "Family or friends enjoying outdoor dining with ALDI Nord products, picnic table or BBQ setting, summer atmosphere, social gathering."
     },
     {
         "label": "Lunch prep for work",
-        "prompt": "Professional preparing healthy work lunches using ALDI ingredients, meal prep containers, efficient morning routine."
+        "prompt": "Professional preparing healthy work lunches using ALDI Nordingredients, meal prep containers, efficient morning routine."
     },
     {
         "label": "Cozy breakfast scene",
@@ -81,11 +81,11 @@ export const lifestylePrompts = [
     },
     {
         "label": "Sustainable shopping",
-        "prompt": "Environmentally conscious shopper with reusable bags and sustainable ALDI products, green lifestyle, eco-friendly choices."
+        "prompt": "Environmentally conscious shopper with reusable bags and sustainable ALDI Nord products, green lifestyle, eco-friendly choices."
     },
     {
         "label": "Entertaining guests",
-        "prompt": "Host preparing appetizers or entertaining spread using ALDI special buys and premium products, elegant presentation."
+        "prompt": "Host preparing appetizers or entertaining spread using ALDI Nord special buys and premium products, elegant presentation."
     }
 ];
 
@@ -121,11 +121,11 @@ export const marketingPrompts = [
     },
     {
         "label": "Corporate social responsibility",
-        "prompt": "ALDI supporting local community, food donation, sustainability initiatives, authentic documentary-style photography."
+        "prompt": "ALDI Nord supporting local community, food donation, sustainability initiatives, authentic documentary-style photography."
     },
     {
         "label": "Employee spotlight",
-        "prompt": "Friendly ALDI team member in uniform helping customers or arranging products, professional retail environment, authentic workplace."
+        "prompt": "Friendly ALDI Nord team member in uniform helping customers or arranging products, professional retail environment, authentic workplace."
     },
     {
         "label": "Brand promise visualization",

@@ -3,14 +3,19 @@ export const getModelDisplayName = (
     engine?: string,
     hasContextImages?: boolean,
 ): string => {
+    console.log('[Debug] getModelDisplayName called with:', { modelIdentifier, engine, hasContextImages });
+    
     if (!modelIdentifier) return "Unknown model";
 
     if (modelIdentifier === "GPT Image 1") {
-        return "GPT Image 1";
+        return hasContextImages ? "GPT-4 Vision (Edit)" : "GPT-4 Vision";
     } else if (modelIdentifier === "FLUX.1 Kontext Pro") {
         return "FLUX.1 Kontext Pro";
+    } else if (modelIdentifier === "Gemini") {
+        return hasContextImages ? "Gemini Flash Image (Nano Banana)" : `Gemini (${engine || 'default'})`;
     } else {
-        return hasContextImages ? "Gemini Flash Image (Nano Banana)" : `Gemini (${engine})`;
+        // Fallback for any unmatched models
+        return modelIdentifier;
     }
 }
 
