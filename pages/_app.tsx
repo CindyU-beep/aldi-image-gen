@@ -18,7 +18,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
       <>
         <Theme accentColor="blue" appearance="light" panelBackground="soft">
           <Head>
-            <title>ALDI Nord Image Studio</title>
+            <title>ALDI Nord Marketing Studio</title>
             <meta name="description" content="ALDI Nord marketing image generation and campaign visuals" />
             <link rel="icon" href="/aldi-nord.png" />
           </Head>

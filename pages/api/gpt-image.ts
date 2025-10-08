@@ -77,7 +77,7 @@ export default async function handler(
         const imageCompression = 100;
         const imageVariations = contextSettings?.variations || 1;
 
-        console.log("GPT-4 Vision Image Generation Request:", {
+        console.log("GPT-Image-1 Generation Request:", {
             prompt: prompt.substring(0, 100) + (prompt.length > 100 ? '...' : ''),
             imageCount: contextImages?.length || 0,
             settings: contextSettings
@@ -95,7 +95,7 @@ export default async function handler(
         const endpoint = edits;
 
         // Always use edits endpoint with automatic ALDI logo integration
-        console.log("GPT-4 Vision with automatic ALDI logo from public folder:", {
+        console.log("GPT-Image-1 with automatic ALDI logo from public folder:", {
             prompt,
             imageSize,
             imageQuality,

@@ -1,5 +1,5 @@
 import { Card, TextArea, Button, IconButton, Flex, Tabs, Heading, Tooltip, Radio, Text, Switch, Badge } from '@radix-ui/themes';
-import { IconTrash, IconArrowsSplit, IconPhotoPlus, IconCircleArrowLeft, IconCircleArrowRight, IconArrowBarBoth, IconSeo, IconX } from '@tabler/icons-react';
+import { IconTrash, IconArrowsSplit, IconPhotoPlus, IconCircleArrowLeft, IconCircleArrowRight, IconArrowBarBoth, IconSeo, IconShieldCheck, IconX } from '@tabler/icons-react';
 import useStore, { Settings } from '@/lib/store';
 import { CardData } from '@/components/pages/ProjectPage';
 import { useState, useEffect } from 'react';
@@ -7,6 +7,7 @@ import useEmblaCarousel from 'embla-carousel-react';
 import { useImageGeneration } from '@/hooks/useImageGeneration';
 import { useImagePreview } from '@/hooks/useImagePreview';
 import { useSEO } from '@/hooks/useSEO';
+import { useBrandCompliance } from '@/hooks/useBrandCompliance';
 import useImageBlob from '@/hooks/useImageBlob';
 import TimelineCardImage from './TimelineCardImage';
 import { TimelineCardPrompts } from './TimelineCardPrompts';
@@ -87,6 +88,7 @@ export default function TimelineCard({ projectId, timelineId, card, index, width
     const [emblaRef, emblaApi] = useEmblaCarousel({});
     const { openPreview, PreviewOverlay } = useImagePreview();
     const { createSEO, SEODialog } = useSEO();
+    const { checkCompliance, BrandComplianceDialog } = useBrandCompliance();
 
     // Initialize default settings if they don't exist
     const cardObj: TimelineCardData = {
@@ -389,6 +391,13 @@ export default function TimelineCard({ projectId, timelineId, card, index, width
                             <IconSeo size={20} />
                         </IconButton>
                     </Tooltip>
+                    <Tooltip content="Check brand compliance">
+                        <IconButton variant="ghost" radius="full" onClick={() =>
+                            checkCompliance(card.outputContextImage ?? null)
+                        } highContrast>
+                            <IconShieldCheck size={20} />
+                        </IconButton>
+                    </Tooltip>
                 </Flex>
                 {isLast && (
                     <Tooltip content="Delete card">
@@ -404,6 +413,8 @@ export default function TimelineCard({ projectId, timelineId, card, index, width
 
             {/* Add the SEO Dialog */}
             <SEODialog />
+            {/* Add the Brand Compliance Dialog */}
+            <BrandComplianceDialog />
         </Card>
     )
 }

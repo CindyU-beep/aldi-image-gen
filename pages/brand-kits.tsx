@@ -94,12 +94,11 @@ export default function BrandKitsPage() {
                 <Card>
                   <Flex direction="column" p="4" gap="3">
                     <Heading size="4">Color palette</Heading>
-                    <Grid columns={{ initial: '2', sm: '3' }} gap="3">
+                    <Grid columns={{ initial: '2', sm: '2' }} gap="3">
                       {[
                         { name: 'Blue 700', var: 'var(--aldi-blue-700)' },
                         { name: 'Blue 600', var: 'var(--aldi-blue-600)' },
                         { name: 'Cyan 400', var: 'var(--aldi-cyan-400)' },
-                        { name: 'Orange 500', var: 'var(--aldi-orange-500)' },
                         { name: 'Red 500', var: 'var(--aldi-red-500)' },
                       ].map((c) => (
                         <Box key={c.name} className="rounded-md overflow-hidden border" style={{ borderColor: 'var(--gray-5)' }}>

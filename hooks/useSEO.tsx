@@ -119,14 +119,6 @@ export function useSEO() {
 
                     {!isLoading && seoData?.raw && (
                         <>
-                            <Callout.Root>
-                                <Callout.Icon>
-                                    <IconInfoCircle />
-                                </Callout.Icon>
-                                <Callout.Text>
-                                    This feature is designed for eCommerce optimisation.<br />For best results, the first image in your timeline should be a model shot imported via product search, with any modifications made afterward.
-                                </Callout.Text>
-                            </Callout.Root>
                             <Flex gap="8" mt="4" className="markdown">
                                 <Box style={{ flex: '1' }}>
                                     {(tokenizedImageUrl || currentImageUrl) && (
